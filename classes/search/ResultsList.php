@@ -147,6 +147,7 @@ class ResultsList extends Search {
 		]);
 
 		$result_list = self::execute($conn, $stmt, 'get');
+		Logger::tg_log($prepared['text'] . ' (' . $query['nspaces'] . ') ' . ' - ' . $count);
 
 		return [
 			'namespaces'  => $prepared['nspaces'],

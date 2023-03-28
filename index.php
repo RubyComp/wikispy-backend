@@ -2,6 +2,7 @@
 
 require __DIR__ . '/config.php';
 require __DIR__ . '/classes/Answer.php';
+require __DIR__ . '/classes/Logger.php';
 
 header(CTYPE);
 

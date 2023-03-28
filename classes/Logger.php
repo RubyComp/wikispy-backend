@@ -22,7 +22,6 @@ class Logger {
 	}
 
 	public static function write($text) {
-
 		$file_path = self::get_file_path();
 		$current = file_get_contents($file_path);
 
@@ -35,7 +34,6 @@ class Logger {
 	}
 
 	public static function log(string $text) {
-
 		if (!self::file_exists())
 			self::create_file_blank();
 
@@ -44,15 +42,11 @@ class Logger {
 
 		self::write("{$date} - {$ip} - {$text}");
 		self::tg_log("{$ip} - {$text}");
-
 	}
 
-	protected static function tg_log($text) {
-
+	public static function tg_log($text) {
 		$encodedMessage = urlencode($text);
-
 		$queryUrl = 'https://api.telegram.org/bot' . TG_TOKEN . '/sendMessage?chat_id=' . TG_USER_ID . '&text=' . $encodedMessage;
-
 		file_get_contents($queryUrl);
 	}
 
