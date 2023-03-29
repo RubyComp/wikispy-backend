@@ -12,19 +12,17 @@ class ResultsCount extends Search {
 			FROM `$table`
 			WHERE content LIKE ?
 			AND `$table`.ns
-				IN (?)
+				IN (" . implode(',', $params['nspace']) . ")
 			AND `$table`.`issub`
-				IN (?);"
+				IN (" . implode(',', $params['types']) . ");"
 		);
 		
 		if(!$stmt)
 			ExceptionHandler::show_error("SQL Error: {$conn->errno} - {$conn->error}");
 
 		$stmt->bind_param(
-			'sss',
-			$params['text'],
-			$params['nspace'],
-			$params['types']
+			's',
+			$params['text']
 		);
 
 		$result = self::execute($conn, $stmt, 'get');

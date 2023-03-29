@@ -17,7 +17,14 @@ class ResultsList extends Search {
 		return self::$params;
 	}
 
-	protected static function get_sql(string $page, string $content, string $order) {
+	protected static function get_sql(
+		string $page,
+		string $content,
+		array $ns,
+		array $types,
+		string $order
+	) {
+
 		$sql = "SELECT
 			`$content`.id,
 			`$page`.title,
@@ -28,13 +35,14 @@ class ResultsList extends Search {
 			FROM `$content`
 			INNER JOIN `$page` ON `$content`.id = `$page`.id
 			WHERE content LIKE ?
-			AND `$content`.`ns` IN (?)
-			AND `$content`.`issub` IN (?)
+			AND `$content`.`ns` IN (" . implode(',', $ns) . ")
+			AND `$content`.`issub` IN (" . implode(',', $types) . ")
 			ORDER BY `$page`.`$order`
 			LIMIT ? OFFSET ?;";
 
 		return $sql;
 	}
+	// AND `$content`.`ns` IN (" . implode(',', array_fill(0, count($query['nspaces']), '?')) . ")
 
 	protected static function parse_param(array $data, string $name, string $type) {
 
@@ -117,22 +125,21 @@ class ResultsList extends Search {
 		$prepared['offset'] = self::get_offset($prepared);
 
 		$query = Validate::stringify_array($prepared);
+		$query = $prepared;
 		$query['text'] = self::get_search_action($prepared['text'], 'like');
 
 		$table_pages   = self::$config['pages-table'];
 		$table_content = self::$config['content-table'];
 
 		$conn = self::get_connect('content');
-		$sql = self::get_sql($table_pages, $table_content, $query['order']);
+		$sql = self::get_sql($table_pages, $table_content, $prepared['nspaces'], $prepared['types'], $query['order']);
 
 		$stmt = self::prepare_query(
 			$conn,
 			$sql,
 			[
-				'sssii',
+				'sii',
 				$query['text'],
-				$query['nspaces'],
-				$query['types'],
 				$query['limit'],
 				$query['offset']
 			]
@@ -147,7 +154,7 @@ class ResultsList extends Search {
 		]);
 
 		$result_list = self::execute($conn, $stmt, 'get');
-		Logger::tg_log($prepared['text'] . ' (' . $query['nspaces'] . ') ' . ' - ' . $count);
+		Logger::tg_log($prepared['text'] . ' (' . implode(',', $query['nspaces']) . ') ' . ' - ' . $count);
 
 		return [
 			'namespaces'  => $prepared['nspaces'],
