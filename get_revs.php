@@ -1,8 +1,23 @@
 <?php
-require 'config.php';
-require 'queries.php';
+// require 'config.php';
+// require 'queries.php';
 
 header('Content-Type: application/json; charset=utf-8');
+
+$data = [
+'labels' => ['10;2015','11;2015'],
+'datasets' => [
+	[
+		'label' => 'edits',
+		'data' => [4000, 4800],
+	],
+],
+];
+Answer::success([
+	$data
+]);
+die();
+
 
 if (!isset($_GET['mode'])) {
 	fail('Mode is unset');
