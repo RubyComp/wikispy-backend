@@ -56,7 +56,7 @@ class Validate {
 		if (in_array($value, $white))
 			return $value;
 		else
-			return false;
+			return $white[0];
 	}
 
 	public static function get_int_arr(array $arr) {

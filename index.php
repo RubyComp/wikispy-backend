@@ -1,8 +1,9 @@
 <?php
 
-require __DIR__ . '/config.php';
-require __DIR__ . '/classes/Answer.php';
-require __DIR__ . '/classes/Logger.php';
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/classes/Answer.php';
+require_once __DIR__ . '/classes/Logger.php';
+require_once __DIR__ . '/classes/ExceptionHandler.php';
 
 header(CTYPE);
 

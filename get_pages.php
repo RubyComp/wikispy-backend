@@ -1,7 +1,7 @@
 <?php
 
-require 'core/api/classes/Query.php';
-require 'core/api/classes/Answer.php';
+require_once 'core/api/classes/Query.php';
+require_once 'core/api/classes/Answer.php';
 
 if (!isset($_GET['at']) || !isset($_GET['to'])) {
 	Answer::fail('Params "at" and "to" is unset');

@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '../../Query.php';
+require_once __DIR__ . '../../Query.php';
 
 class Search extends Query {
 
@@ -8,6 +8,7 @@ class Search extends Query {
 		'limit' => 25,
 		'nspaces' => [0],
 		'order' => 'id',
+		'direct' => 'desc',
 		'page' => 1,
 		'types' => 'all',
 	];
@@ -25,8 +26,12 @@ class Search extends Query {
 		'sub'
 	];
 
-	public static function get_default_val(string $key) {
+	protected static $direct_list = [
+		'asc',
+		'desc'
+	];
 
+	public static function get_default_val(string $key) {
 		if (array_key_exists($key, self::$default))
 			return self::$default[$key];
 		else
@@ -39,6 +44,10 @@ class Search extends Query {
 
 	public static function get_types_list() {
 		return self::$types_list;
+	}
+
+	public static function get_direct_list() {
+		return self::$direct_list;
 	}
 
 	public static function get_search_action(string $text, string $mode) {
@@ -67,11 +76,6 @@ class Search extends Query {
 			default:
 				return $all;
 		}
-	}
-
-	public static function prepare_arr(array $arr, string $name) {
-		$clear = self::valid_array($arr, $name);
-		return join(',', $clear);
 	}
 
 	protected static function prepare_query($conn, $sql, $data) {

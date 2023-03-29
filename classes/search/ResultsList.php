@@ -7,10 +7,11 @@ class ResultsList extends Search {
 	protected static $params = [
 		'text'    => 'string',
 		'order'   => 'string',
+		'direct'  => 'string',
 		'types'   => 'string',
 		'page'    => 'int',
 		'limit'   => 'int',
-		'nspaces' => 'array',
+		'nspaces' => 'array'
 	];
 
 	public static function get_params() {
@@ -22,9 +23,9 @@ class ResultsList extends Search {
 		string $content,
 		array $ns,
 		array $types,
-		string $order
+		string $order,
+		string $direct
 	) {
-
 		$sql = "SELECT
 			`$content`.id,
 			`$page`.title,
@@ -38,11 +39,11 @@ class ResultsList extends Search {
 			AND `$content`.`ns` IN (" . implode(',', $ns) . ")
 			AND `$content`.`issub` IN (" . implode(',', $types) . ")
 			ORDER BY `$page`.`$order`
+			$direct
 			LIMIT ? OFFSET ?;";
 
 		return $sql;
 	}
-	// AND `$content`.`ns` IN (" . implode(',', array_fill(0, count($query['nspaces']), '?')) . ")
 
 	protected static function parse_param(array $data, string $name, string $type) {
 
@@ -66,9 +67,7 @@ class ResultsList extends Search {
 		}
 	}
 
-	protected static function set_param(array $data, string $name, string $type) {
-
-		$value = $data[$name];
+	protected static function set_param($value, string $name, string $type) {
 
 		switch ($name) {
 			case 'text':
@@ -92,6 +91,10 @@ class ResultsList extends Search {
 				$valid = Validate::get_white_listed($value, self::get_types_list());
 				break;
 
+			case 'direct':
+				$valid = Validate::get_white_listed($value, self::get_direct_list());
+				break;
+
 			default:
 				ExceptionHandler::show_error('Incrorrect param name: ' . $name);
 				break;
@@ -104,7 +107,7 @@ class ResultsList extends Search {
 	protected static function prepare(array $data) {
 		$result = [];
 		foreach (self::$params as $name => $type) {
-			$parsed[$name] = self::parse_param($data, $name, $type);
+			$parsed = self::parse_param($data, $name, $type);
 			$result[$name] = self::set_param($parsed, $name, $type);
 		}
 		return $result;
@@ -132,7 +135,7 @@ class ResultsList extends Search {
 		$table_content = self::$config['content-table'];
 
 		$conn = self::get_connect('content');
-		$sql = self::get_sql($table_pages, $table_content, $prepared['nspaces'], $prepared['types'], $query['order']);
+		$sql = self::get_sql($table_pages, $table_content, $prepared['nspaces'], $prepared['types'], $query['order'], $query['direct']);
 
 		$stmt = self::prepare_query(
 			$conn,
@@ -168,6 +171,7 @@ class ResultsList extends Search {
 				'value'    => $query['order'],
 				'possible' => self::get_orders_list(),
 			],
+			'direct'      => $prepared['direct'],
 			'paginator'   => [
 				'page'     => $prepared['page'],
 				'limit'    => $prepared['limit'],
