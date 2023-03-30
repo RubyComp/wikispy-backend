@@ -14,9 +14,9 @@ if (isset($_GET['action'])){
 		// 	require_once('get_pages.php');
 		// 	break;
 
-		// case 'get_revs':
-		// 	require_once('get_revs.php');
-		// 	break;
+		case 'get_revs':
+			require_once('get_revs.php');
+			break;
 
 		case 'search':
 			require_once('search.php');
