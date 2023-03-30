@@ -1,18 +1,44 @@
 <?php
-// require 'config.php';
-// require 'queries.php';
 
-header('Content-Type: application/json; charset=utf-8');
+function rand_data($min, $max, $length) {
+	$numbers = array();
+	for ($i = 0; $i < $length; $i++) {
+		 $numbers[] = rand($min, $max);
+	}
+	return $numbers;
+}
 
 $data = [
-'labels' => ['10;2015','11;2015'],
-'datasets' => [
-	[
-		'label' => 'edits',
-		'data' => [4000, 4800],
+	'labels' => [
+		'1;2015',
+		'2;2015',
+		'3;2015',
+		'4;2015',
+		'5;2015',
+		'6;2015',
+		'7;2015',
+		'8;2015',
+		'9;2015',
+		'10;2015',
+		'11;2015',
+		'12;2015'
 	],
-],
+	'datasets' => [
+		[
+			'label' => 'edits',
+			'data' => rand_data(4000, 5000, 12),
+		],
+		[
+			'label' => 'test',
+			'data' => rand_data(2000, 3500, 12),
+		],
+		[
+			'label' => 'test',
+			'data' => rand_data(1000, 2000, 12),
+		],
+	],
 ];
+
 Answer::success([
 	$data
 ]);
