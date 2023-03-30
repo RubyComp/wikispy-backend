@@ -18,14 +18,14 @@ class Query {
 	protected static function get_connect($base) {
 
 		switch ($base) {
-			case 'main':
-				$conn = new mysqli(
-					SERVERNAME,
-					USERNAME,
-					PASSWORD,
-					DBNAME
-				);
-				break;
+			// case 'main':
+			// 	$conn = new mysqli(
+			// 		SERVERNAME,
+			// 		USERNAME,
+			// 		PASSWORD,
+			// 		DBNAME
+			// 	);
+			// 	break;
 			case 'content':
 				$conn = new mysqli(
 					SERVERNAME_C,
@@ -34,10 +34,20 @@ class Query {
 					DBNAME_C
 				);
 				break;
+			case 'revs':
+				$conn = new mysqli(
+					SERVERNAME_R,
+					USERNAME_R,
+					PASSWORD_R,
+					DBNAME_R
+				);
+				break;
+			default:
+				ExceptionHandler::show_error("Uncurrect connection type: {$base}");
 		}
 
 		if ($conn->connect_error)
-			die('Connection failed: ' . $conn->connect_error);
+			ExceptionHandler::show_error("Connection failed for {$base}: {$conn->connect_error}");
 
 		$conn->set_charset(CHARSET);
 
@@ -60,9 +70,17 @@ class Query {
 		return $response;
 	}
 
+	public static function prepare_query($conn, $sql, $data = false) {
+		$stmt = $conn->prepare($sql);
 
+		if(!$stmt)
+			ExceptionHandler::show_error("SQL Error: {$conn->errno} - {$conn->error}");
 
+		if ($data)
+			$stmt->bind_param(...$data);
 
+		return $stmt;
+	}
 
 	// public static function get_pages_by_id_range(int $at, int $to) {
 
@@ -159,6 +177,5 @@ class Query {
 
 	// 	return $result;
 	// }
-
 
 }

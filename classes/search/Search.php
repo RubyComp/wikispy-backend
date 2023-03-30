@@ -78,16 +78,6 @@ class Search extends Query {
 		}
 	}
 
-	protected static function prepare_query($conn, $sql, $data) {
-		$stmt = $conn->prepare($sql);
-
-		if(!$stmt)
-			ExceptionHandler::show_error("SQL Error: {$conn->errno} - {$conn->error}");
-
-		$stmt->bind_param(...$data);
-		return $stmt;
-	}
-
 	protected static function validate_limit(array $params) {
 		$default = self::$default['limit'];
 		if (Validate::arr_has_value($params, 'limit')) {
