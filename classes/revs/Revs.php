@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '../../Query.php';
+require_once __DIR__ . '../../ChartData.php';
 
 class Revs extends Query {
 
@@ -11,10 +12,10 @@ class Revs extends Query {
 		'all' => "SELECT
 			YEAR(timestamp) AS year,
 			MONTH(timestamp) AS month,
-			COUNT(*) AS count
+			COUNT(*) AS edits,
+			COUNT(DISTINCT userid) AS users
 		FROM
 			`revs` ft
-			JOIN `users` ut ON ft.userid = ut.id
 		WHERE
 			ft.missing = 0
 		GROUP BY
@@ -29,7 +30,8 @@ class Revs extends Query {
 		'bots' => "SELECT
 				YEAR(timestamp) AS year,
 				MONTH(timestamp) AS month,
-				COUNT(*) AS count
+				COUNT(*) AS edits,
+				COUNT(DISTINCT userid) AS users
 			FROM
 				`revs` ft
 				JOIN `users` ut ON ft.userid = ut.id
@@ -47,7 +49,8 @@ class Revs extends Query {
 		'nobots' => "SELECT
 				YEAR(timestamp) AS year,
 				MONTH(timestamp) AS month,
-				COUNT(*) AS count
+				COUNT(*) AS edits,
+				COUNT(DISTINCT userid) AS users
 			FROM
 				`revs` ft
 				JOIN `users` ut ON ft.userid = ut.id
@@ -76,61 +79,6 @@ class Revs extends Query {
 		return self::$revs_sql[$mode];
 	}
 
-	/*
-	* Make specific date format for chart js
-	*/
-	protected static function format_data(array $input) {
-
-		$data = [
-			'labels' => [/*'10;2015','11;2015'*/],
-			'datasets' => [
-				[
-					'label' => 'edits',
-					'data' => [/*4000, 4800*/],
-				],
-			],
-		];
-
-		$raw_data = [];
-
-		foreach ($input as $key => $value) {
-			$year = $value['year'];
-
-			if(!key_exists($year, $raw_data))
-				$raw_data[$year] = array_fill_keys(range(1,12), 0);
-
-			$raw_data[$year][$value['month']] = intval($value['count']);
-		}
-
-		$years_keys = array_keys($raw_data);
-
-		$first_year = min($years_keys);
-		$last_year = max($years_keys);
-
-		foreach ($raw_data[$first_year] as $mounth => $edits) {
-			if ($edits == 0)
-				unset($raw_data[$first_year][$mounth]);
-			else
-				break;
-		}
-
-		foreach (array_reverse($raw_data[$last_year]) as $mounth => $edits) {
-			if ($edits == 0 || $mounth == abs(date('n')-12))
-				unset($raw_data[$last_year][abs($mounth-12)]);
-			else
-				break;
-		}
-
-		foreach ($raw_data as $year => $mounths) {
-			foreach ($mounths as $mounth => $edits) {
-				array_push($data['labels'], $mounth . ';' . $year);
-				array_push($data['datasets'][0]['data'], $edits);
-			}
-		}
-
-		return $data;
-	}
-
 	public static function get_stats(string $mode) {
 
 		$valid_mode = self::validate_mode($mode);
@@ -146,7 +94,9 @@ class Revs extends Query {
 
 		$result = self::execute($conn, $stmt, 'get');
 
-		return self::format_data($result['data']);
+		return [
+			ChartData::format($result['data']),
+		];
 
 	}
 
