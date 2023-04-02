@@ -22,6 +22,10 @@ if (isset($_GET['action'])){
 			require_once('search.php');
 			break;
 
+		case 'test':
+			require_once('test.php');
+			break;
+
 		default:
 			Answer::fail('Incorrect action');
 			break;
