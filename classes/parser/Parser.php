@@ -1,17 +1,19 @@
 <?php
 
+require_once __DIR__ . '/../Query.php';
+require_once __DIR__ . '/../MWQuery.php';
+require_once __DIR__ . '/../search/LastRevId.php';
+
 Class Parser {
 
-	public static function get_lastrevid() {
 
-		$url = WIKI_API . '?action=query&list=recentchanges&rclimit=1&rcprop=ids&format=json';
-		$json = file_get_contents($url);
-		$answer = json_decode($json);
+	// public static function get_last_stored_rev_id() {
+	// }
 
-		$lastrevid = $answer->query->recentchanges[0]->old_revid;
-
-		return $lastrevid;
-
+	public static function test() {
+		return LastRevId::get_id();
 	}
+
+
 
 }
